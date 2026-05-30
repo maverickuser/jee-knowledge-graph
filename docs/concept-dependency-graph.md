@@ -171,8 +171,9 @@ The CI workflow runs Ruff, unit tests, a DynamoDB import dry run, and Terraform
 format/validation on pushes and pull requests.
 
 The CD workflow is manually triggered. It validates the repo, applies the
-DynamoDB/S3/IAM write-path Terraform, then publishes a graph version. Configure
-these GitHub settings before running CD:
+DynamoDB/S3/IAM write-path Terraform, then publishes a graph version. It also
+runs automatically after CI succeeds on `main`. Configure these GitHub settings
+before running CD:
 
 - Secret `AWS_ROLE_TO_ASSUME`: IAM role ARN trusted by GitHub OIDC.
 - Variable `TERRAFORM_STATE_BUCKET`: pre-existing S3 bucket for Terraform state.
@@ -180,6 +181,10 @@ these GitHub settings before running CD:
 - Optional variable `GRAPH_TABLE_NAME`: defaults to `jee-knowledge-graph`.
 - Optional variable `GRAPH_ARTIFACT_BUCKET_NAME`: leave empty to use the
   Terraform-derived bucket name.
+
+The destroy workflow is manually triggered only. It requires typing
+`destroy-jee-knowledge-graph` and disables DynamoDB deletion protection plus S3
+artifact bucket retention for that destroy run.
 
 ## Review Rules
 

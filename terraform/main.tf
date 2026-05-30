@@ -38,7 +38,8 @@ resource "aws_dynamodb_table" "knowledge_graph" {
 }
 
 resource "aws_s3_bucket" "graph_artifacts" {
-  bucket = local.artifact_bucket_name
+  bucket        = local.artifact_bucket_name
+  force_destroy = var.artifact_bucket_force_destroy
 
   tags = {
     Project     = var.project_name

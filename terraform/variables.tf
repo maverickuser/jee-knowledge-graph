@@ -40,3 +40,8 @@ variable "import_report_retention_days" {
   default     = 90
 }
 
+variable "artifact_bucket_force_destroy" {
+  description = "Allow Terraform destroy to delete the graph artifact bucket even when it contains objects."
+  type        = bool
+  default     = false
+}

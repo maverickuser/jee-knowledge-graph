@@ -1,6 +1,13 @@
 name: CD
 
 on:
+  workflow_run:
+    workflows:
+      - CI
+    branches:
+      - main
+    types:
+      - completed
   workflow_dispatch:
     inputs:
       graph_version:
@@ -21,6 +28,7 @@ jobs:
   validate:
     name: Validate build inputs
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Check out repository
@@ -93,7 +101,9 @@ jobs:
             -var="aws_region=${{ vars.AWS_REGION || 'ap-south-1' }}" \
             -var="environment=prod" \
             -var="graph_table_name=${{ vars.GRAPH_TABLE_NAME || 'jee-knowledge-graph' }}" \
-            -var="artifact_bucket_name=${{ vars.GRAPH_ARTIFACT_BUCKET_NAME }}"
+            -var="artifact_bucket_name=${GRAPH_ARTIFACT_BUCKET_NAME:-}"
+        env:
+          GRAPH_ARTIFACT_BUCKET_NAME: ${{ vars.GRAPH_ARTIFACT_BUCKET_NAME }}
 
       - name: Read Terraform outputs
         id: read_outputs
@@ -132,10 +142,23 @@ jobs:
         id: graph_version
         shell: bash
         run: |
-          if [ -n "${{ inputs.graph_version }}" ]; then
-            echo "value=${{ inputs.graph_version }}" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.graph_version }}" ]; then
+            GRAPH_VERSION="${{ inputs.graph_version }}"
+          elif [ "${{ github.event_name }}" = "workflow_run" ]; then
+            GRAPH_VERSION="physics-${{ github.event.workflow_run.id }}"
           else
-            echo "value=physics-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+            GRAPH_VERSION="physics-${{ github.run_id }}"
+          fi
+          echo "value=${GRAPH_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve dry-run mode
+        id: dry_run
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run_import }}" = "true" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Publish graph to DynamoDB
@@ -143,7 +166,7 @@ jobs:
           PYTHONPATH: src
         run: |
           DRY_RUN_FLAG=""
-          if [ "${{ inputs.dry_run_import }}" = "true" ]; then
+          if [ "${{ steps.dry_run.outputs.enabled }}" = "true" ]; then
             DRY_RUN_FLAG="--dry-run --output /tmp/dynamodb_import_preview.jsonl --report-output /tmp/dynamodb_import_report.json"
           fi
 
