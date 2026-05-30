@@ -170,10 +170,11 @@ preview the exact DynamoDB items. A live import writes all items for the new
 The CI workflow runs Ruff, unit tests, a DynamoDB import dry run, and Terraform
 format/validation on pushes and pull requests.
 
-The CD workflow is manually triggered. It validates the repo, applies the
-DynamoDB/S3/IAM write-path Terraform, then publishes a graph version. It also
-runs automatically after CI succeeds on `main`. Configure these GitHub settings
-before running CD:
+The CD workflow is manually triggered. It validates the repo, checks AWS caller
+identity, Terraform state bucket access, and basic DynamoDB/S3 permissions,
+applies the DynamoDB/S3/IAM write-path Terraform, then publishes a graph
+version. It also runs automatically after CI succeeds on `main`. Configure these
+GitHub settings before running CD:
 
 - Secret `AWS_ROLE_TO_ASSUME`: IAM role ARN trusted by GitHub OIDC.
 - Variable `TERRAFORM_STATE_BUCKET`: pre-existing S3 bucket for Terraform state.
