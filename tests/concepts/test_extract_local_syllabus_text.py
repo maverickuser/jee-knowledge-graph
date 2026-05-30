@@ -24,7 +24,7 @@ class ExtractLocalSyllabusTextTest(unittest.TestCase):
     def test_resolve_tool_prefers_scoop_shim(self, _exists):
         resolved = _resolve_tool("pdftoppm")
 
-        self.assertTrue(resolved.endswith(r"scoop\shims\pdftoppm.exe"))
+        self.assertEqual(Path(resolved).parts[-3:], ("scoop", "shims", "pdftoppm.exe"))
 
     @patch("scripts.extract_local_syllabus_text._extract_embedded_text", return_value="")
     @patch("scripts.extract_local_syllabus_text._missing_ocr_tools", return_value=[])
