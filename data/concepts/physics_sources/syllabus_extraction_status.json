@@ -1,0 +1,7 @@
+{
+  "status": "ocr_produced_no_text",
+  "input_pdf": "C:\\Users\\Saurabh\\Downloads\\physics\\syllabus (1).pdf",
+  "rendered_page_count": 1,
+  "rendered_image_bytes": 33210,
+  "message": "OCR tools ran but produced no text. The rendered PDF appears to contain no extractable text content."
+}

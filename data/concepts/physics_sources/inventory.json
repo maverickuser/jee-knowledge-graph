@@ -1,0 +1,75 @@
+[
+  {
+    "path": "C:\\Users\\Saurabh\\Downloads\\physics\\concepts_of_physics_by_h.c._verma_volume_1.pdf",
+    "filename": "concepts_of_physics_by_h.c._verma_volume_1.pdf",
+    "source_kind": "reference_book",
+    "title_hint": "concepts of physics by h c verma volume 1",
+    "page_count": 471,
+    "extracted_page_count": 20,
+    "heading_count": 123,
+    "extraction_notes": []
+  },
+  {
+    "path": "C:\\Users\\Saurabh\\Downloads\\physics\\concepts_of_physics_by_h.c._verma_volume_2.pdf",
+    "filename": "concepts_of_physics_by_h.c._verma_volume_2.pdf",
+    "source_kind": "reference_book",
+    "title_hint": "concepts of physics by h c verma volume 2",
+    "page_count": 481,
+    "extracted_page_count": 16,
+    "heading_count": 45,
+    "extraction_notes": []
+  },
+  {
+    "path": "C:\\Users\\Saurabh\\Downloads\\physics\\keph1ps.pdf",
+    "filename": "keph1ps.pdf",
+    "source_kind": "ncert_physics_english",
+    "title_hint": "keph1ps",
+    "page_count": 16,
+    "extracted_page_count": 16,
+    "heading_count": 71,
+    "extraction_notes": []
+  },
+  {
+    "path": "C:\\Users\\Saurabh\\Downloads\\physics\\keph2ps.pdf",
+    "filename": "keph2ps.pdf",
+    "source_kind": "ncert_physics_english",
+    "title_hint": "keph2ps",
+    "page_count": 16,
+    "extracted_page_count": 16,
+    "heading_count": 69,
+    "extraction_notes": []
+  },
+  {
+    "path": "C:\\Users\\Saurabh\\Downloads\\physics\\leph1ps.pdf",
+    "filename": "leph1ps.pdf",
+    "source_kind": "ncert_physics_english",
+    "title_hint": "leph1ps",
+    "page_count": 16,
+    "extracted_page_count": 16,
+    "heading_count": 85,
+    "extraction_notes": []
+  },
+  {
+    "path": "C:\\Users\\Saurabh\\Downloads\\physics\\leph2ps.pdf",
+    "filename": "leph2ps.pdf",
+    "source_kind": "ncert_physics_english",
+    "title_hint": "leph2ps",
+    "page_count": 18,
+    "extracted_page_count": 15,
+    "heading_count": 56,
+    "extraction_notes": []
+  },
+  {
+    "path": "C:\\Users\\Saurabh\\Downloads\\physics\\syllabus (1).pdf",
+    "filename": "syllabus (1).pdf",
+    "source_kind": "jee_syllabus",
+    "title_hint": "syllabus (1)",
+    "page_count": 1,
+    "extracted_page_count": 0,
+    "heading_count": 0,
+    "extraction_notes": [
+      "No embedded text extracted; OCR or text source required.",
+      "No heading candidates extracted."
+    ]
+  }
+]

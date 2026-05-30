@@ -1,0 +1,72 @@
+{
+  "exam": "JEE Advanced",
+  "year": 2026,
+  "subject": "Physics",
+  "official_source_url": "https://jeeadv.ac.in/documents/jee-advanced-2026-syllabus.pdf",
+  "source_note": "Official JEE Advanced 2026 syllabus PDF states that the 2026 syllabus remains the same as 2025.",
+  "coverage_groups": [
+    {
+      "official_area": "General",
+      "graph_chapters": [
+        "Units And Measurements"
+      ]
+    },
+    {
+      "official_area": "Mechanics",
+      "graph_chapters": [
+        "Motion In A Straight Line",
+        "Motion In A Plane",
+        "Laws Of Motion",
+        "Work, Energy And Power",
+        "System Of Particles And Rotational Motion",
+        "Gravitation",
+        "Mechanical Properties Of Solids",
+        "Mechanical Properties Of Fluids",
+        "Oscillations",
+        "Waves"
+      ]
+    },
+    {
+      "official_area": "Thermal Physics",
+      "graph_chapters": [
+        "Thermal Properties Of Matter",
+        "Thermodynamics",
+        "Kinetic Theory"
+      ]
+    },
+    {
+      "official_area": "Electricity and Magnetism",
+      "graph_chapters": [
+        "Electric Charges And Fields",
+        "Electrostatic Potential And Capacitance",
+        "Current Electricity",
+        "Moving Charges And Magnetism",
+        "Magnetism And Matter",
+        "Electromagnetic Induction",
+        "Alternating Current"
+      ]
+    },
+    {
+      "official_area": "Electromagnetic Waves",
+      "graph_chapters": [
+        "Electromagnetic Waves"
+      ]
+    },
+    {
+      "official_area": "Optics",
+      "graph_chapters": [
+        "Ray Optics And Optical Instruments",
+        "Wave Optics"
+      ]
+    },
+    {
+      "official_area": "Modern Physics",
+      "graph_chapters": [
+        "Dual Nature Of Radiation And Matter",
+        "Atoms",
+        "Nuclei",
+        "Semiconductor Electronics: Materials, Devices And Simple Circuits"
+      ]
+    }
+  ]
+}

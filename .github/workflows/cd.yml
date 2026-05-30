@@ -1,0 +1,154 @@
+name: CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      graph_version:
+        description: "Graph version to publish. Leave blank to use physics-<run-id>."
+        required: false
+        type: string
+      dry_run_import:
+        description: "Run the importer with --dry-run instead of writing to DynamoDB."
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate:
+    name: Validate build inputs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pipx install poetry==1.8.3
+
+      - name: Install dependencies
+        run: poetry install --with dev --no-interaction --no-ansi
+
+      - name: Run unit tests
+        env:
+          PYTHONPATH: src
+        run: poetry run python -m unittest discover tests
+
+      - name: Run import dry run
+        env:
+          PYTHONPATH: src
+        run: |
+          poetry run python scripts/import_physics_graph_to_dynamodb.py \
+            --table-name jee-knowledge-graph \
+            --artifact-bucket jee-knowledge-graph-artifacts \
+            --graph-version cd-validation-${{ github.run_id }} \
+            --dry-run \
+            --output /tmp/dynamodb_import_preview.jsonl \
+            --report-output /tmp/dynamodb_import_report.json
+
+  terraform_apply:
+    name: Apply write-path infrastructure
+    runs-on: ubuntu-latest
+    needs: validate
+    environment: production
+
+    outputs:
+      graph_table_name: ${{ steps.read_outputs.outputs.graph_table_name }}
+      graph_artifact_bucket_name: ${{ steps.read_outputs.outputs.graph_artifact_bucket_name }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.5"
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: |
+          terraform -chdir=terraform init \
+            -backend-config="bucket=${{ vars.TERRAFORM_STATE_BUCKET }}" \
+            -backend-config="key=jee-knowledge-graph/terraform.tfstate" \
+            -backend-config="region=${{ vars.AWS_REGION || 'ap-south-1' }}"
+
+      - name: Terraform apply
+        run: |
+          terraform -chdir=terraform apply -auto-approve \
+            -var="aws_region=${{ vars.AWS_REGION || 'ap-south-1' }}" \
+            -var="environment=prod" \
+            -var="graph_table_name=${{ vars.GRAPH_TABLE_NAME || 'jee-knowledge-graph' }}" \
+            -var="artifact_bucket_name=${{ vars.GRAPH_ARTIFACT_BUCKET_NAME }}"
+
+      - name: Read Terraform outputs
+        id: read_outputs
+        run: |
+          echo "graph_table_name=$(terraform -chdir=terraform output -raw graph_table_name)" >> "$GITHUB_OUTPUT"
+          echo "graph_artifact_bucket_name=$(terraform -chdir=terraform output -raw graph_artifact_bucket_name)" >> "$GITHUB_OUTPUT"
+
+  publish_graph:
+    name: Publish graph version
+    runs-on: ubuntu-latest
+    needs: terraform_apply
+    environment: production
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pipx install poetry==1.8.3
+
+      - name: Install runtime dependencies
+        run: poetry install --only main --no-interaction --no-ansi
+
+      - name: Resolve graph version
+        id: graph_version
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.graph_version }}" ]; then
+            echo "value=${{ inputs.graph_version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=physics-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish graph to DynamoDB
+        env:
+          PYTHONPATH: src
+        run: |
+          DRY_RUN_FLAG=""
+          if [ "${{ inputs.dry_run_import }}" = "true" ]; then
+            DRY_RUN_FLAG="--dry-run --output /tmp/dynamodb_import_preview.jsonl --report-output /tmp/dynamodb_import_report.json"
+          fi
+
+          poetry run python scripts/import_physics_graph_to_dynamodb.py \
+            --table-name "${{ needs.terraform_apply.outputs.graph_table_name }}" \
+            --artifact-bucket "${{ needs.terraform_apply.outputs.graph_artifact_bucket_name }}" \
+            --graph-version "${{ steps.graph_version.outputs.value }}" \
+            $DRY_RUN_FLAG

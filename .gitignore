@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.coverage
+.pytest_cache/
+.ruff_cache/
+.venv/
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+*.tfplan
+data/concepts/graph/dynamodb_import_preview.jsonl
+data/concepts/graph/dynamodb_import_report.json

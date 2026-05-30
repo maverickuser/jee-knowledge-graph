@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "jee-knowledge-graph"
+version = "0.1.0"
+description = "JEE concept dependency graph data, extraction scripts, and validation tools."
+authors = ["OpenAI Codex <codex@example.com>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.14"
+boto3 = ">=1.42.86,<2.0.0"
+pydantic = "2.11.4"
+pdfplumber = "^0.11.7"
+
+[tool.poetry.group.dev.dependencies]
+coverage = {extras = ["toml"], version = "^7.6.0"}
+ruff = "0.11.8"
+
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.coverage.run]
+branch = true
+source = ["src", "scripts"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_covered = true
+exclude_also = [
+  "if __name__ == .__main__.:",
+]

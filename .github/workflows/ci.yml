@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  python:
+    name: Python tests and lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pipx install poetry==1.8.3
+
+      - name: Install dependencies
+        run: poetry install --with dev --no-interaction --no-ansi
+
+      - name: Run Ruff
+        run: poetry run ruff check src scripts tests
+
+      - name: Run unit tests
+        env:
+          PYTHONPATH: src
+        run: poetry run python -m unittest discover tests
+
+      - name: Validate DynamoDB import dry run
+        env:
+          PYTHONPATH: src
+        run: |
+          poetry run python scripts/import_physics_graph_to_dynamodb.py \
+            --table-name jee-knowledge-graph \
+            --artifact-bucket jee-knowledge-graph-artifacts \
+            --graph-version ci-${{ github.run_id }} \
+            --dry-run \
+            --output /tmp/dynamodb_import_preview.jsonl \
+            --report-output /tmp/dynamodb_import_report.json
+
+  terraform:
+    name: Terraform format and validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.5"
+
+      - name: Terraform fmt
+        run: terraform -chdir=terraform fmt -check
+
+      - name: Terraform init without backend
+        run: terraform -chdir=terraform init -backend=false
+
+      - name: Terraform validate
+        run: terraform -chdir=terraform validate
+
