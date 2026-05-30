@@ -4,13 +4,13 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.import_physics_graph_to_dynamodb import (
+from jee_knowledge_graph.dynamodb_import import (
     build_active_control_item,
     build_dynamodb_items,
     build_import_plan,
-    main,
     stale_item_filter,
 )
+from jee_knowledge_graph.dynamodb_import.cli import main
 
 
 CREATED_AT = "2026-05-30T12:00:00+00:00"
